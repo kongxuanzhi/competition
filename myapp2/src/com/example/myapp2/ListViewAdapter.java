@@ -35,31 +35,37 @@ public class ListViewAdapter extends BaseAdapter {
         ImageView headPic = (ImageView) view.findViewById(R.id.headPic);
         headPic.setImageResource(talkrecord.getTalkWith());
 
+        TextView sendTime = (TextView) view.findViewById(R.id.sendTime);
+        sendTime.setText(talkrecord.getSendTime());
+
         TextView contentSon = (TextView)view.findViewById(R.id.talkContent);
         contentSon.setText(talkrecord.getContent());
         contentSon.setBackgroundColor(talkrecord.getBackColor());
+
+        TextView status = (TextView) view.findViewById(R.id.status);
+        status.setText(talkrecord.getStatus());
         return view;
     }
 
     @Override
     public int getCount() {
-        return 0;
+        return ItemsV.length;
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return ItemsV[i];
     }
 
     @Override
     public long getItemId(int i) {
-        return 0;
+        return i;
     }
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        if (view != null)
+       // if (view == null)
             return ItemsV[i];
-        return view;
+       // return view;
     }
 }

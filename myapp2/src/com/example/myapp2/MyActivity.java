@@ -26,17 +26,17 @@ public class MyActivity extends Activity {
         setContentView(R.layout.main);
         listView = (ListView)this.findViewById(R.id.content);
 
-        //Ìî³älistµÃµ½Êı¾İ  ´ÓSqliteÊı¾İ¿âÖĞµÃµ½Êı¾İ
+        //å¡«å……listå¾—åˆ°æ•°æ®  ä»Sqliteæ•°æ®åº“ä¸­å¾—åˆ°æ•°æ®
         getData();
         listView.setAdapter(new ListViewAdapter(this,talkRecords));
 
-        //ÉèÖÃlistView µã»÷ÊÂ¼ş
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-            }
-        });
+//        //è®¾ç½®listView ç‚¹å‡»äº‹ä»¶
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//
+//            }
+//        });
     }
 
     public void getData() {
@@ -44,10 +44,11 @@ public class MyActivity extends Activity {
         for (int i=0;i<10;i++){
             talkRecord  talkrecord =  new talkRecord();
             talkrecord.setID(i);
-            talkrecord.setContent("ÎÒÃ¿ÌìÏëÄã" + (i + 1) + "±é");
-            talkrecord.setBackColor(Color.BLUE);
+            talkrecord.setTalkWith(R.drawable.ic_launcher);
+            talkrecord.setContent("æˆ‘æ¯å¤©æƒ³ä½ " + (i + 1) + "é");
+            talkrecord.setBackColor(Color.GRAY);
             talkrecord.setSendTime(new Date().toString());
-            talkrecord.setStatus("ÒÑ¶Á");
+            talkrecord.setStatus("å·²è¯»");
             talkRecords.add(talkrecord);
         }
     }
