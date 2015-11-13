@@ -2,5 +2,6 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/myapp1/src/com/example/myapp1/MainActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/myapp2/src/com/example/myapp2/MyActivity.java" charset="UTF-8" />
   </component>
 </project>
