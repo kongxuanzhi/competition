@@ -12,7 +12,7 @@ import com.example.myapp2.model.talkRecord;
 import java.util.List;
 
 /**
- * Created by ¿×ÐùÖ¾ on 2015/11/12.
+ * Created by ï¿½ï¿½ï¿½ï¿½Ö¾ on 2015/11/12.
  */
 public class ListViewAdapter extends BaseAdapter {
 
@@ -30,19 +30,29 @@ public class ListViewAdapter extends BaseAdapter {
     private  View makeItemView(talkRecord talkrecord){
         LayoutInflater  inflater = (LayoutInflater)context
         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.item, null);
-
-        ImageView headPic = (ImageView) view.findViewById(R.id.headPic);
+        ImageView headPic;
+        TextView sendTime;
+        TextView contentSon;
+        TextView status;
+        View view = null;
+        if(talkrecord.getIsSelf()==true) {
+            view= inflater.inflate(R.layout.item, null);
+            headPic = (ImageView) view.findViewById(R.id.send_headPic);
+            sendTime = (TextView) view.findViewById(R.id.send_Time);
+            contentSon = (TextView)view.findViewById(R.id.send_talkContent);
+            status = (TextView) view.findViewById(R.id.send_status);
+        }
+        else{
+            view = inflater.inflate(R.layout.receiveitem, null);
+            headPic = (ImageView) view.findViewById(R.id.rec_headPic);
+            sendTime = (TextView) view.findViewById(R.id.rec_Time);
+            contentSon = (TextView)view.findViewById(R.id.rec_talkContent);
+            status = (TextView) view.findViewById(R.id.rec_status);
+        }
         headPic.setImageResource(talkrecord.getTalkWith());
-
-        TextView sendTime = (TextView) view.findViewById(R.id.sendTime);
         sendTime.setText(talkrecord.getSendTime());
-
-        TextView contentSon = (TextView)view.findViewById(R.id.talkContent);
         contentSon.setText(talkrecord.getContent());
         contentSon.setBackgroundColor(talkrecord.getBackColor());
-
-        TextView status = (TextView) view.findViewById(R.id.status);
         status.setText(talkrecord.getStatus());
         return view;
     }

@@ -15,6 +15,16 @@ public class talkRecord {
 
     private int backColor;  // ±³¾°É«
 
+    private Boolean isSelf;
+
+    public Boolean getIsSelf() {
+        return isSelf;
+    }
+
+    public void setIsSelf(Boolean isSelf) {
+        this.isSelf = isSelf;
+    }
+
     public int getID() {
         return ID;
     }
