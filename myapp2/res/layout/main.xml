@@ -12,8 +12,8 @@
 			/>
 	<RelativeLayout android:layout_width="fill_parent" android:layout_height="50dp"
 					android:orientation="horizontal"
+					android:id="@+id/edit"
 			>
-
 		<EditText
 				android:id="@+id/input"
 				android:layout_width="match_parent"
@@ -22,16 +22,16 @@
 				android:layout_toLeftOf="@+id/sendMsg"
 				/>
 		 <Button
-				android:id="@+id/sendMsg"
-				android:onClick="sendMsg"
-				android:text="@string/send"
-				android:layout_width="65dp"
-				android:layout_height="45dp"
-				android:layout_alignParentRight="true"
-				/>
+			android:id="@+id/sendMsg"
+			android:onClick="sendMsg"
+			android:text="@string/send"
+			android:layout_width="65dp"
+			android:layout_height="45dp"
+			android:layout_alignParentRight="true"
+			/>
 		<Button
 				android:id="@+id/sendVoiceMsg"
-				android:onClick="sendMsg"
+				android:onClick="sendVoice"
 			   android:background="@drawable/voice"
 				android:layout_width="65dp"
 				android:layout_height="45dp"

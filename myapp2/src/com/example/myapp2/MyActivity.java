@@ -10,19 +10,19 @@ import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
+import com.baidu.voicerecognition.android.ui.DialogRecognitionListener;
 import com.example.myapp2.model.talkRecord;
 import com.tuling.util.GetTulingResultThread;
 import com.tuling.util.ResultWatcher;
+import com.tuling.util.TulingManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 public class MyActivity extends Activity {
     /**
@@ -30,43 +30,56 @@ public class MyActivity extends Activity {
      */
     private ListView listView;
     private TextView input;
-    private static final int MESSAGE_GET_RESULT=2;
+    private Button voice_btn;
+    private Button send_msg;
+    private RelativeLayout edit;
+    private TulingManager manager;
+    private static final int CHANGE_BTN = 1;
+    private static final int VOICE_RECOGNIZE = 2;
+    private static final int MESSAGE_GET_RESULT=3;
     static final String keyTuling = "1deb50ef7d72b9e73907598a50abc60f";
     static final String keyxuan = "8e62bd9fa524a13a7a0de8510f2e3fa9";
     static String userID="545";
     static String userID2="546";
-
 
     List<talkRecord> talkRecords = new ArrayList<talkRecord>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        getData();
+        setViewComposeinit();
+        //填充list得到数据  从Sqlite数据库中得到数据
+    }
+    private void setViewComposeinit() {
         listView = (ListView)this.findViewById(R.id.content);
         input    = (TextView)this.findViewById(R.id.input);
+        voice_btn = (Button) this.findViewById(R.id.sendVoiceMsg);
+        send_msg = (Button) this.findViewById(R.id.sendMsg);
+        edit = (RelativeLayout) this.findViewById(R.id.edit);
+        manager = new TulingManager(this);
 
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                System.out.println("beforeTextChanged");
             }
-
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                Toast.makeText(getApplication(),charSequence.toString(),Toast.LENGTH_SHORT);
+                System.out.println("onTextChanged");
             }
-
             @Override
             public void afterTextChanged(Editable editable) {
-
+                String input_msg = editable.toString();
+                if(input_msg.equals("")||input_msg.equals(null)){
+                    handler.obtainMessage(CHANGE_BTN, R.drawable.voice).sendToTarget();
+                }
+                else{
+                    handler.obtainMessage(CHANGE_BTN, R.drawable.xuan).sendToTarget();
+                }
             }
         });
-
-        //填充list得到数据  从Sqlite数据库中得到数据
-        getData();
-
         listView.setAdapter(new ListViewAdapter(this, talkRecords));
-
         //设置listView 点击事件
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -88,7 +101,6 @@ public class MyActivity extends Activity {
                 conMenu.add(0, 2, 2, "条目三");
             }
         });
-
         listView.setSelection(talkRecords.size());
     }
     public void sendMsg(View view){
@@ -97,16 +109,33 @@ public class MyActivity extends Activity {
             Toast.makeText(this,"您未输入任何内容!",Toast.LENGTH_SHORT);
             return;
         }
-        talkRecord talkrecord = new talkRecord();
-        talkrecord.setID(11);
-        talkrecord.setContent(inputs);
-        talkrecord.setTalkWith(R.drawable.xuan);
-        talkrecord.setStatus("已读");
-        talkrecord.setBackColor(Color.WHITE);
-        talkrecord.setSendTime(new Date().toString());
-        talkrecord.setIsSelf(true);
+        talkRecord talkrecord = new talkRecord(11,R.drawable.xuan,inputs,
+                new Date().toString(), "已读" ,Color.WHITE, true);
         refresh(talkrecord);
-
+        getTulingAnswer(inputs);
+    }
+    public void sendVoice(View view){
+        manager.showRecognizeDialog(new DialogRecognitionListener() {
+            @Override  //通过语音给图灵机器说话
+            public void onResults(Bundle recog_Result) {
+                if (recog_Result != null) {
+                    ArrayList<String> list = recog_Result.getStringArrayList("results_recognition");
+                    String say_Input = list.get(0);
+                    int index = say_Input.lastIndexOf("发送");
+                    if(index>-1 && index >=say_Input.length()-3){
+                        talkRecord talkrecord = new talkRecord(11,R.drawable.xuan,say_Input.substring(0, index),
+                                new Date().toString(), "已读" ,Color.WHITE, true);
+                        refresh(talkrecord);
+                        getTulingAnswer(say_Input.substring(0,index));
+                    }
+                    else{
+                         input.setText(say_Input);
+                    }
+                }
+            }
+        });
+    }
+    public void getTulingAnswer(String inputs){
         new GetTulingResultThread(keyxuan, inputs, userID, new ResultWatcher() {
             @Override
             public void onResults(String result) {
@@ -121,27 +150,34 @@ public class MyActivity extends Activity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                talkRecord resultTuling = new talkRecord();
-                resultTuling.setID(11);
-                resultTuling.setContent(resultBack);
-                resultTuling.setTalkWith(R.drawable.ic_launcher);
-                resultTuling.setStatus("已读");
-                resultTuling.setBackColor(Color.BLUE);
-                resultTuling.setSendTime(new Date().toString());
-                resultTuling.setIsSelf(false);
-                handler.obtainMessage(1,resultTuling).sendToTarget();
+                talkRecord resultTuling = new talkRecord(11,R.drawable.ic_launcher,resultBack,
+                        new Date().toString(), "已读" ,Color.BLUE, false);
+                handler.obtainMessage(MESSAGE_GET_RESULT,resultTuling).sendToTarget();
             }
         }).start();
     }
-
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg){
-            talkRecord result=(talkRecord) msg.obj;
-            refresh(result);
+            switch (msg.what){
+                case MESSAGE_GET_RESULT:
+                    talkRecord result=(talkRecord) msg.obj;
+                    refresh(result);
+                    break;
+                case CHANGE_BTN:
+                    int btn = Integer.parseInt(msg.obj.toString());
+                    if(btn==R.drawable.voice){
+                        edit.removeView(send_msg);
+                        edit.removeView(voice_btn);
+                        edit.addView(voice_btn);
+                    }else{
+                        edit.removeView(voice_btn);
+                        edit.removeView(send_msg);
+                        edit.addView(send_msg);
+                    }
+                    break;
+            }
         }
-
     };
     public void  refresh(talkRecord talkrecord){
         talkRecords.add(talkrecord);
@@ -149,7 +185,6 @@ public class MyActivity extends Activity {
         listView.setSelection(talkRecords.size());
         input.setText(null);
     }
-
     //长按菜单处理函数
     public boolean onContextItemSelected(MenuItem aItem) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)aItem.getMenuInfo();
@@ -172,15 +207,9 @@ public class MyActivity extends Activity {
         //从数据库中读取初始数据
         talkRecords.clear();
         for (int i=0;i<2;i++){
-            talkRecord  talkrecord =  new talkRecord();
-            talkrecord.setID(i);
-            talkrecord.setTalkWith(R.drawable.ic_launcher);
-            talkrecord.setContent("我每天想你" + (i + 1) + "遍");
-            talkrecord.setBackColor(Color.GRAY);
-            talkrecord.setSendTime(new Date().toString());
-            talkrecord.setStatus("已读");
-            talkrecord.setIsSelf(false);
-            talkRecords.add(talkrecord);
+            talkRecord talkInit = new talkRecord(i,R.drawable.ic_launcher,"我每天想你" + (i + 1) + "遍",
+                    new Date().toString(), "已读" ,Color.GRAY, false);
+            talkRecords.add(talkInit);
         }
     }
 }

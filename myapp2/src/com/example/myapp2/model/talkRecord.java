@@ -17,6 +17,16 @@ public class talkRecord {
 
     private Boolean isSelf;
 
+    public talkRecord(int ID, int talkWith, String content, String sendTime, String status, int backColor, Boolean isSelf) {
+        this.ID = ID;
+        this.talkWith = talkWith;
+        this.content = content;
+        this.sendTime = sendTime;
+        this.status = status;
+        this.backColor = backColor;
+        this.isSelf = isSelf;
+    }
+
     public Boolean getIsSelf() {
         return isSelf;
     }
